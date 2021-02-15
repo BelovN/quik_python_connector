@@ -11,5 +11,3 @@ USERS = {
         'url': 'tcp://127.0.0.1:5561'
     }
 }
-
-# TODO: Settings for logger

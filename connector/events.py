@@ -1,4 +1,4 @@
-import asyncio
+import logging
 from dataclasses import dataclass, field
 from typing import Any, Callable, List
 from .connection import TypeConnection, QConnector, QConnection
@@ -38,6 +38,7 @@ class EventTypes:
 
 @dataclass
 class Event:
+    name: str
     data_type: Any
     is_subscribed: bool
     callbacks: List[Callable] = field(default_factory=list)
@@ -46,132 +47,158 @@ class Event:
 EVENTS = {
     EventTypes.EVENT_TYPE_UNKNOWN: None,
     EventTypes.ON_STOP: Event(
+        name='ON_STOP',
         data_type=qlua_structures_pb2.StopEventInfo,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_CLOSE: Event(
+        name='ON_CLOSE',
         data_type=qlua_structures_pb2.StopEventInfo,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_CONNECTED: Event(
+        name='ON_CONNECTED',
         data_type=qlua_structures_pb2.ConnectedEventInfo,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_DISCONNECTED: Event(
+        name='ON_DISCONNECTED',
         data_type=None,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_FIRM: Event(
+        name='ON_FIRM',
         data_type=qlua_structures_pb2.Firm,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_ALL_TRADE: Event(
+        name='ON_ALL_TRADE',
         data_type=qlua_structures_pb2.AllTrade,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_TRADE: Event(
+        name='ON_TRADE',
         data_type=qlua_structures_pb2.Trade,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_ORDER: Event(
+        name='ON_ORDER',
         data_type=qlua_structures_pb2.Order,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_ACCOUNT_BALANCE: Event(
+        name='ON_ACCOUNT_BALANCE',
         data_type=qlua_structures_pb2.AccountBalance,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_FUTURES_LIMIT_CHANGE: Event(
+        name='ON_FUTURES_LIMIT_CHANGE',
         data_type=qlua_structures_pb2.FuturesLimit,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_FUTURES_LIMIT_DELETE: Event(
+        name='ON_FUTURES_LIMIT_DELETE',
         data_type=qlua_structures_pb2.FuturesLimitDelete,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_FUTURES_CLIENT_HOLDING: Event(
+        name='ON_FUTURES_CLIENT_HOLDING',
         data_type=qlua_structures_pb2.FuturesClientHolding,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_MONEY_LIMIT: Event(
+        name='ON_MONEY_LIMIT',
         data_type=qlua_structures_pb2.MoneyLimit,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_MONEY_LIMIT_DELETE: Event(
+        name='ON_MONEY_LIMIT_DELETE',
         data_type=qlua_structures_pb2.MoneyLimitDelete,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_DEPO_LIMIT: Event(
+        name='ON_DEPO_LIMIT',
         data_type=qlua_structures_pb2.DepoLimit,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_DEPO_LIMIT_DELETE: Event(
+        name='ON_DEPO_LIMIT_DELETE',
         data_type=qlua_structures_pb2.DepoLimitDelete,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_ACCOUNT_POSITION: Event(
+        name='ON_ACCOUNT_POSITION',
         data_type=qlua_structures_pb2.AccountPosition,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_NEG_DEAL: Event(
+        name='ON_NEG_DEAL',
         data_type=qlua_structures_pb2.NegDeal,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_NEG_TRADE: Event(
+        name='ON_NEG_TRADE',
         data_type=qlua_structures_pb2.NegTrade,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_STOP_ORDER: Event(
+        name='ON_STOP_ORDER',
         data_type=qlua_structures_pb2.StopOrder,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_TRANS_REPLY: Event(
+        name='ON_TRANS_REPLY',
         data_type=qlua_structures_pb2.Transaction,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_PARAM: Event(
+        name='ON_PARAM',
         data_type=qlua_structures_pb2.ParamEventInfo,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_QUOTE: Event(
+        name='ON_QUOTE',
         data_type=qlua_structures_pb2.QuoteEventInfo,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_CLEAN_UP: Event(
+        name='ON_CLEAN_UP',
         data_type=None,
         is_subscribed=False,
         callbacks=[],
     ),
     EventTypes.ON_DATA_SOURCE_UPDATE: Event(
+        name='ON_DATA_SOURCE_UPDATE',
         data_type=qlua_structures_pb2.DataSourceUpdateInfo,
         is_subscribed=False,
         callbacks=[],
     ),
 }
 
+logger = logging.getLogger('events')
 
 @singleton
 class Dispatcher:
@@ -215,4 +242,6 @@ class EventHandler:
             response = event.data_type()
             response.ParseFromString(message_data)
 
+        response_str = str(response).replace('\n', ' ')
+        logger.info(f'{event.name} {response_str}')
         await self.add_callbacks(event, response)

@@ -51,7 +51,6 @@ class QConnection:
     async def listen(self) -> bytes:
         self.listening = True
         response = await self.socket.recv_multipart()
-        # await asyncio.sleep(0.5)
         self.listening = False
         return response
 
@@ -136,7 +135,7 @@ class QConnector:
 
         await self.send(data=encoded_request)
 
-        time.sleep(0.1) # - Для того, чтобы QUIK успел ответить
+        time.sleep(0.2) # - Для того, чтобы QUIK успел ответить
 
         response = await self.listen()
 
