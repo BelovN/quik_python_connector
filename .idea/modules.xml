@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="ProjectModuleManager">
+    <modules>
+      <module fileurl="file://$PROJECT_DIR$/../connector/.idea/connector.iml" filepath="$PROJECT_DIR$/../connector/.idea/connector.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../../Quik-Junior/lua/.idea/lua.iml" filepath="$PROJECT_DIR$/../../Quik-Junior/lua/.idea/lua.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/trading.iml" filepath="$PROJECT_DIR$/.idea/trading.iml" />
+    </modules>
+  </component>
+</project>
