@@ -2,9 +2,11 @@ import asyncio
 import logging.config
 
 from settings import LOGGING_CONFIG
-logging.config.dictConfig(LOGGING_CONFIG)
-
 from connector.events import Dispatcher, EventTypes
+
+
+#Настройка логгера
+logging.config.dictConfig(LOGGING_CONFIG)
 
 
 async def listen_quik(dispatcher):

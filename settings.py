@@ -1,3 +1,7 @@
+import os
+
+BASE_DIR = os.path.dirname(os.path.realpath(__file__))
+
 
 USERS = {
     'REQ': {
@@ -28,7 +32,6 @@ FIRM_ID = {
     'currency': "MB1000100000", # Валютный
 }
 
-# TODO: Settings for logger
 LOGGING_CONFIG = {
     'version': 1,
     'disable_existing_loggers': False,
@@ -42,31 +45,31 @@ LOGGING_CONFIG = {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.FileHandler',
-            'filename': 'logs/qpc.log',
+            'filename': os.path.join(BASE_DIR, 'logs/qpc.log'),
         },
         'errors': {
             'level': 'ERROR',
             'formatter': 'standard',
             'class': 'logging.FileHandler',
-            'filename': 'logs/errors.log',
+            'filename': os.path.join(BASE_DIR, 'logs/errors.log'),
         },
         'connector': {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.FileHandler',
-            'filename': 'logs/connector.log',
+            'filename': os.path.join(BASE_DIR, 'logs/connector.log'),
         },
         'events': {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.FileHandler',
-            'filename': 'logs/events.log',
+            'filename': os.path.join(BASE_DIR, 'logs/events.log'),
         },
         'trade': {
             'level': 'INFO',
             'formatter': 'standard',
             'class': 'logging.FileHandler',
-            'filename': 'logs/trade.log',
+            'filename': os.path.join(BASE_DIR, 'logs/trade.log'),
         },
     },
     'loggers': {
