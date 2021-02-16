@@ -1,7 +1,7 @@
 from __future__ import annotations
 from dataclasses import dataclass
 from datetime import datetime
-from utils import TemplateList
+from .utils import TemplateList
 
 
 @dataclass
@@ -12,6 +12,7 @@ class Bar:
     close: float
     dtime: datetime
     volume: int
+    index: int
 
     def __post_init__(self):
         # TODO: Check attributes types
@@ -26,21 +27,54 @@ class Bar:
         if self.volume <= 0:
             raise ValueError('Attribute "value" must be greater than 0!')
 
+    @staticmethod
+    def _convert_time(time):
+        dtime = datetime(time.year, time.month, time.day, time.hour, time.min, time.sec)
+        return dtime
+
+    @staticmethod
+    def _convert_from_quik(response):
+        dtime = Bar._convert_time(response.time)
+        args_dict = {
+            'open': float(response.open),
+            'high': float(response.high),
+            'low': float(response.low),
+            'close': float(response.close),
+            'volume': int(float(response.volume)),
+            'index': int(response.index),
+            'dtime': dtime,
+        }
+        return args_dict
+
+    @staticmethod
+    def from_quik(response):
+        args_dict = Bar._convert_from_quik(response)
+        bar = Bar(**args_dict)
+        return bar
+
+    def update_from_quik(self, response):
+        args_dict = Bar._convert_from_quik(response)
+        self.close = args_dict['close']
+        self.high = args_dict['high']
+        self.low = args_dict['low']
+        self.volume = args_dict['volume']
+
 
 @dataclass
 class BarsList(TemplateList):
     """Базовый класс списка свечей"""
     type_value = Bar
-    ticker: str
-    period: int
+    sec_code: str
+    class_code: str
+    interval: int
 
     def __post_init__(self):
         self._items = []
-        if self.period <= 0:
-            raise ValueError('Attribute "period" must be greater than 0!')
+        if self.interval <= 0:
+            raise ValueError('Attribute "interval" must be greater than 0!')
 
     def copy(self):
-        new_instance = BarsList(ticker=self.ticker, period=self.period)
+        new_instance = BarsList(sec_code=self.sec_code, class_code=self.class_code, interval=self.interval)
         new_instance._items = self._items
         return new_instance
 

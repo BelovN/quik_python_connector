@@ -41,12 +41,6 @@ LOGGING_CONFIG = {
         },
     },
     'handlers': {
-        'default': {
-            'level': 'INFO',
-            'formatter': 'standard',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/qpc.log'),
-        },
         'errors': {
             'level': 'ERROR',
             'formatter': 'standard',
@@ -65,28 +59,14 @@ LOGGING_CONFIG = {
             'class': 'logging.FileHandler',
             'filename': os.path.join(BASE_DIR, 'logs/events.log'),
         },
-        'trade': {
-            'level': 'INFO',
-            'formatter': 'standard',
-            'class': 'logging.FileHandler',
-            'filename': os.path.join(BASE_DIR, 'logs/trade.log'),
-        },
     },
     'loggers': {
-        'default': {
-            'handlers': ['default', 'errors'],
-            'level': 'INFO',
-        },
         'connector': {
             'handlers': ['connector', 'errors'],
             'level': 'INFO',
         },
         'events': {
             'handlers': ['events', 'errors'],
-            'level': 'INFO',
-        },
-        'trade': {
-            'handlers': ['trade', 'errors'],
             'level': 'INFO',
         },
     }

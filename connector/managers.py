@@ -50,7 +50,7 @@ class BaseManager:
         self.manager_connection = ManagerConnection(type_connection=TypeConnection.REQ)
 
     def __repr__(self):
-        return ' '.join([self.__class__.__name__, str(id(self))])
+        return ' ,'.join([self.__class__.__name__, str(id(self))])
 
 
 class QDataSourceManager(BaseManager):

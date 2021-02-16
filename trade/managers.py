@@ -1,50 +1,38 @@
-from base import Bar, BarsList, Transaction, TransactionsList
+import asyncio
+from .base import Bar, BarsList, Transaction, TransactionsList
+
 from connector.managers import QDataSourceManager, QTradeManager, QPortfolioManager, Interval
 from datetime import datetime
 from settings import USER_SETTINGS, ACCOUNTS, FIRM_ID
+from connector.events import Dispatcher, EventTypes
 
 
 class BarsManager:
     """Класс обертка для QDataSourceManager. Создает datasource и возвращает BarsList"""
     datasource_manager: QDataSourceManager
 
-    def __init__(self):
+    def __init__(self, class_code: str, sec_code: str, interval: int):
         self.datasource_manager = QDataSourceManager()
+        self.class_code = class_code
+        self.sec_code = sec_code
+        self.interval = interval
+        self.bars = BarsList(class_code=class_code, sec_code=sec_code, interval=interval)
 
-    async def _get_single_bar(self, datasource_uuid: str, index: int) -> Bar:
-        O = float(await self.datasource_manager._O(datasource_uuid=datasource_uuid, candle_index=index))
-        H = float(await self.datasource_manager._H(datasource_uuid=datasource_uuid, candle_index=index))
-        L = float(await self.datasource_manager._L(datasource_uuid=datasource_uuid, candle_index=index))
-        C = float(await self.datasource_manager._C(datasource_uuid=datasource_uuid, candle_index=index))
-        T = await self.datasource_manager._T(datasource_uuid=datasource_uuid, candle_index=index)
-        dtime = datetime(T.year, T.month, T.day, T.hour, T.min, T.sec)
-        V = int(float(await self.datasource_manager._V(datasource_uuid=datasource_uuid, candle_index=index)))
-
-        if O == 0 and H == 0 and L == 0 and C == 0:
-            raise ValueError('Candle with params: datasource_uuid=' + datasource_uuid +
-                             ' index=' + str(index) + 'does not exist!')
-
-        single_bar = Bar(O, H, L, C, dtime, V)
-        return single_bar
-
-    async def get_bars(self, class_code: str, sec_code: str, interval: int, count: int = None) -> BarsList:
-        datasource_uuid = await self.datasource_manager._create_data_source(class_code=class_code,
-                                                                            sec_code=sec_code,
-                                                                            interval=interval)
-
-        size = await self.datasource_manager._size(datasource_uuid=datasource_uuid)
-        if count is not None:
-            _count = min(size, count)
+    def add_updated_bar(self, response):
+        if int(response.index) != self.bars[-1].index:
+            bar = Bar.from_quik(response=response)
+            self.bars.append(bar)
         else:
-            _count = size
+            self.bars[-1].update_from_quik(response=response)
 
-        bars = BarsList(ticker=sec_code, period=interval)
+    async def subscribe(self):
+        datasource_uuid = await self.datasource_manager._create_data_source(
+            class_code=self.class_code, sec_code=self.sec_code, interval=self.interval
+        )
+        
+        await self.datasource_manager._set_update_callback(datasource_uuid=datasource_uuid)
 
-        for i in range(_count):
-            single_bar = self._get_single_bar(datasource_uuid=datasource_uuid, index=i + 1)
-            bars.append(single_bar)
-
-        return bars
+        Dispatcher().subscribe(event_type=EventTypes.ON_DATA_SOURCE_UPDATE, callback=self.add_updated_bar)
 
 
 class TransactionsManager:
@@ -184,15 +172,21 @@ class ProtfolioManager:
         self.fixed_term = response
         print(self.fixed_term)
 
+    def update_client_holding(self, response):
+        self.client_holding = response
 
+    async def async_update_limit(self, response):
+        self.futures_limit = await self.portfolio_manager._get_futures_limit(
+            firmid=response.firmid,
+            trdaccid=ACCOUNTS['fixed_term'],
+            limit_type=0,
+            currcode='SUR'
+        )
 
-import asyncio
-
-# mgr = TransactionsManager(account, class_code, sec_code)
-#
-# mgr.send_stoploss_takeprofit_order(price, stop_price, take_price, operation, quantity, spread, offset)
-# # ds = '009031cf-957a-49e5-c9bf-2cdbb5834d03'
-#
-# async def get_ds():
-#     # b = await mgr._create_data_source(class_code="QJSIM", sec_code="SBER", interval=Interval.TICK)
-#     await mgr._set_update_callback(datasource_uuid=ds)
+    def update_limit_change(self, response):
+        asyncio.ensure_future(self.async_update_limit(response=response))
+    
+    async def subscribe_futures(self):
+        dispatcher = Dispatcher()
+        dispatcher.subscribe(event_type=EventTypes.ON_FUTURES_CLIENT_HOLDING, callback=self.update_client_holding)
+        dispatcher.subscribe(event_type=EventTypes.ON_FUTURES_LIMIT_CHANGE, callback=self.update_limit_change)
