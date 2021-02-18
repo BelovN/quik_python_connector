@@ -12,6 +12,11 @@ class TemplateList(MutableSequence):
             raise ValueError(f' value must be instance of {self.type_value} class. Not a ' + str(type(value)))
         self._items.insert(index, self.type_value)
 
+    def copy(self):
+        new_instance = self.__class__()
+        new_instance._items = self._items
+        return new_instance
+
     def __setitem__(self, index: int, value) -> None:
         if not isinstance(value, self.type_value):
             raise ValueError(f' value must be instance of {self.type_value} class. Not a ' + str(type(value)))

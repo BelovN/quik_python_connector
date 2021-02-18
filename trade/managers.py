@@ -1,8 +1,7 @@
 import asyncio
-from .base import Bar, BarsList, Transaction, TransactionsList
+from .base import Bar, BarsList, Transaction, TransactionsList, Order, OrdersList, StopOrder, StopOrdersList
 
-from connector.managers import QDataSourceManager, QTradeManager, QPortfolioManager, Interval
-from datetime import datetime
+from connector.managers import QDataSourceManager, QTradeManager, QPortfolioManager
 from settings import USER_SETTINGS, ACCOUNTS, FIRM_ID
 from connector.events import Dispatcher, EventTypes
 
@@ -146,6 +145,7 @@ class TransactionsManager:
 
 
 class ProtfolioManager:
+    """Класс для работы с портфолио"""
     portfolio_manager: QPortfolioManager
 
     def __init__(self):
@@ -190,3 +190,26 @@ class ProtfolioManager:
         dispatcher = Dispatcher()
         dispatcher.subscribe(event_type=EventTypes.ON_FUTURES_CLIENT_HOLDING, callback=self.update_client_holding)
         dispatcher.subscribe(event_type=EventTypes.ON_FUTURES_LIMIT_CHANGE, callback=self.update_limit_change)
+
+
+class OrdersManager:
+    transactions_manager: TransactionsManager
+
+    def __init__(self, account, sec_code, class_code):
+        self.transactions_manager = TransactionsManager(
+            account=account, sec_code=sec_code, class_code=class_code
+        )
+        self.orders = OrdersList()
+        self.stop_orders = StopOrdersList()
+
+    def update_orders(self, response):
+        order = Order.from_quik(response) # --------TODO
+        self.orders.append(order)
+
+    def update_stop_orders(self, response):
+        stop_order = StopOrder.from_quik(response) # --------TODO
+        self.stop_orders.append(stop_order)
+
+    async def subscribe(self):
+        Dispatcher().subscribe(event_type=EventTypes.ON_ORDER, callback=self.update_orders)
+        Dispatcher().subscribe(event_type=EventTypes.ON_STOP_ORDER, callback=self.update_stop_orders)

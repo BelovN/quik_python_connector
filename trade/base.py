@@ -73,11 +73,6 @@ class BarsList(TemplateList):
         if self.interval <= 0:
             raise ValueError('Attribute "interval" must be greater than 0!')
 
-    def copy(self):
-        new_instance = BarsList(sec_code=self.sec_code, class_code=self.class_code, interval=self.interval)
-        new_instance._items = self._items
-        return new_instance
-
 
 class Transaction:
     CLASSCODE: str
@@ -227,7 +222,140 @@ class TransactionsList(TemplateList):
     def __post_init__(self):
         self._items = []
 
-    def copy(self):
-        new_instance = TransactionsList()
-        new_instance._items = self._items
-        return new_instance
+@dataclass
+class Order:
+    order_num: int
+    flags: int
+    brokerref: str
+    userid: str
+    firmid: str
+    account: str
+    price: float
+    qty: int
+    balance: float
+    value: float
+    accrudint: float
+    _yield: float
+    trans_id: int
+    client_code: str
+    price2: float
+    settlecode: str
+    uid: int
+    canceled_uid: int
+    exchange_code: str
+    activation_time: str
+    linkedorder: int
+    expiry: int
+    sec_code: str
+    class_code: str
+    _datetime: datetime
+    withdraw_datetime: datetime
+    bank_acc_id: str
+    value_entry_type: int
+    repoterm: int
+    repovalue: int
+    repo2value: int
+    repo_value_balance: int
+    start_discount: float
+    reject_reason: str
+    ext_order_flags: int
+    min_qty: int
+    exec_type: int
+    side_qualifier: float
+    acnt_type: float
+    capacity: float
+    passive_only_order: float
+    visible: int
+
+    @staticmethod
+    def from_quik(data):
+        order = Order(
+            order_num=data.order_num, flags=data.flags, brokerref=data.brokerref, userid=data.userid,
+            firmid=data.firmid, account=data.account, price=data.price, qty=data.qty, balance=data.balance,
+            value=data.value, accrudint=data.accrudint, _yield=data._yield, trans_id=data.trans_id,
+            client_code=data.client_code, price2=data.price2, settlecode=data.settlecode, uid=data.uid,
+            canceled_uid=data.canceled_uid, exchange_code=data.exchange_code, activation_time=data.activation_time,
+            linkedorder=data.linkedorder, expiry=data.expiry, sec_code=data.sec_code, class_code=data.class_code,
+            _datetime=data._datetime, withdraw_datetime=data.withdraw_datetime, bank_acc_id=data.bank_acc_id,
+            value_entry_type=data.value_entry_type, repoterm=data.repoterm, repovalue=data.repovalue,
+            repo2value=data.repo2value, repo_value_balance=data.repo_value_balance, start_discount=data.start_discount,
+            reject_reason=data.reject_reason, ext_order_flags=data.ext_order_flags, min_qty=data.min_qty,
+            exec_type=data.exec_type, side_qualifier=data.side_qualifier, acnt_type=data.acnt_type,
+            capacity=data.capacity, passive_only_order=data.passive_only_order, visible=data.visible,
+        )
+        return order
+
+
+@dataclass
+class OrdersList(TemplateList):
+    type_value = Order
+
+    def __post_init__(self):
+        self._items = []
+
+
+@dataclass
+class StopOrder:
+    order_num: int
+    ordertime: float
+    flags: int
+    brokerref: str
+    firmid: str
+    account: str
+    condition: int
+    condition_price: float
+    price: float
+    qty: int
+    linkedorder: int
+    expiry: float
+    trans_id: int
+    client_code: str
+    co_order_num: str
+    co_order_price: float
+    stop_order_type: int
+    orderdate: float
+    alltrade_num: int
+    stopflags: float
+    offset: float
+    spread: float
+    balance: float
+    uid: int
+    filled_qty: int
+    withdraw_time: float
+    condition_price2: float
+    active_from_time: float
+    active_to_time: float
+    sec_code: str
+    class_code: str
+    condition_sec_code: str
+    condition_class_code: str
+    canceled_uid: int
+    order_date_time: datetime
+    withdraw_datetime: datetime
+
+    @staticmethod
+    def from_quik(data):
+        stop_order = StopOrder(
+            order_num=data.order_num, ordertime=data.ordertime, flags=data.flags, brokerref=data.brokerref,
+            firmid=data.firmid, account=data.account, condition=data.condition, condition_price=data.condition_price,
+            price=data.price, qty=data.qty, linkedorder=data.linkedorder, expiry=data.expiry, trans_id=data.trans_id,
+            client_code=data.client_code, co_order_num=data.co_order_num, co_order_price=data.co_order_price,
+            stop_order_type=data.stop_order_type, orderdate=data.orderdate, alltrade_num=data.alltrade_num,
+            stopflags=data.stopflags, offset=data.offset, spread=data.spread, balance=data.balance, uid=data.uid,
+            filled_qty=data.filled_qty, withdraw_time=data.withdraw_time, condition_price2=data.condition_price2,
+            active_from_time=data.active_from_time, active_to_time=data.active_to_time, sec_code=data.sec_code,
+            class_code=data.class_code, condition_sec_code=data.condition_sec_code,
+            condition_class_code=data.condition_class_code, canceled_uid=data.canceled_uid,
+            order_date_time=data.order_date_time, withdraw_datetime=data.withdraw_datetime,
+        )
+        return stop_order
+
+
+@dataclass
+class StopOrdersList(TemplateList):
+    type_value = StopOrder
+
+    def __post_init__(self):
+        self._items = []
+
+
