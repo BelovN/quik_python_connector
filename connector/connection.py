@@ -124,6 +124,7 @@ class ProtobufED:
 
 
 class QConnector:
+    """Класс для отправки в запросов в Quik"""
     qconnection: QConnection
 
     def __init__(self, connection):

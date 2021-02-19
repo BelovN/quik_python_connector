@@ -1,8 +1,6 @@
 import asyncio
 import logging.config
 
-from trade.managers import BarsManager
-from connector.managers import Interval
 from settings import LOGGING_CONFIG
 from connector.events import Dispatcher, EventTypes
 
@@ -23,10 +21,6 @@ def printer(response):
 def populate_tasks():
     dispatcher = Dispatcher()
     dispatcher.subscribe(EventTypes.ON_QUOTE, callback=printer)
-
-    mgr = BarsManager(class_code='QJSIM', sec_code='SBER', interval=Interval.M1)
-    # asyncio.ensure_future(mgr.subscribe())
-
     asyncio.ensure_future(listen_quik(dispatcher))
 
 

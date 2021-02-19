@@ -222,6 +222,7 @@ class TransactionsList(TemplateList):
     def __post_init__(self):
         self._items = []
 
+
 @dataclass
 class Order:
     order_num: int
@@ -268,19 +269,25 @@ class Order:
     visible: int
 
     @staticmethod
+    def _convert_time(time):
+        dtime = datetime(time.year, time.month, time.day, time.hour, time.min, time.sec)
+        return dtime
+
+    @staticmethod
     def from_quik(data):
         order = Order(
             order_num=data.order_num, flags=data.flags, brokerref=data.brokerref, userid=data.userid,
             firmid=data.firmid, account=data.account, price=data.price, qty=data.qty, balance=data.balance,
             value=data.value, accrudint=data.accrudint, _yield=data._yield, trans_id=data.trans_id,
             client_code=data.client_code, price2=data.price2, settlecode=data.settlecode, uid=data.uid,
-            canceled_uid=data.canceled_uid, exchange_code=data.exchange_code, activation_time=data.activation_time,
+            canceled_uid=data.canceled_uid, exchange_code=data.exchange_code,
+            activation_time=Order._convert_time(data.activation_time),
             linkedorder=data.linkedorder, expiry=data.expiry, sec_code=data.sec_code, class_code=data.class_code,
-            _datetime=data._datetime, withdraw_datetime=data.withdraw_datetime, bank_acc_id=data.bank_acc_id,
-            value_entry_type=data.value_entry_type, repoterm=data.repoterm, repovalue=data.repovalue,
-            repo2value=data.repo2value, repo_value_balance=data.repo_value_balance, start_discount=data.start_discount,
-            reject_reason=data.reject_reason, ext_order_flags=data.ext_order_flags, min_qty=data.min_qty,
-            exec_type=data.exec_type, side_qualifier=data.side_qualifier, acnt_type=data.acnt_type,
+            _datetime=Order._convert_time(data._datetime), withdraw_datetime=Order._convert_time(data.withdraw_datetime),
+            bank_acc_id=data.bank_acc_id, value_entry_type=data.value_entry_type, repoterm=data.repoterm,
+            repovalue=data.repovalue, repo2value=data.repo2value, repo_value_balance=data.repo_value_balance,
+            start_discount=data.start_discount, reject_reason=data.reject_reason, ext_order_flags=data.ext_order_flags,
+            min_qty=data.min_qty, exec_type=data.exec_type, side_qualifier=data.side_qualifier, acnt_type=data.acnt_type,
             capacity=data.capacity, passive_only_order=data.passive_only_order, visible=data.visible,
         )
         return order
@@ -334,19 +341,27 @@ class StopOrder:
     withdraw_datetime: datetime
 
     @staticmethod
+    def _convert_time(time):
+        dtime = datetime(time.year, time.month, time.day, time.hour, time.min, time.sec)
+        return dtime
+
+    @staticmethod
     def from_quik(data):
         stop_order = StopOrder(
-            order_num=data.order_num, ordertime=data.ordertime, flags=data.flags, brokerref=data.brokerref,
-            firmid=data.firmid, account=data.account, condition=data.condition, condition_price=data.condition_price,
-            price=data.price, qty=data.qty, linkedorder=data.linkedorder, expiry=data.expiry, trans_id=data.trans_id,
-            client_code=data.client_code, co_order_num=data.co_order_num, co_order_price=data.co_order_price,
-            stop_order_type=data.stop_order_type, orderdate=data.orderdate, alltrade_num=data.alltrade_num,
-            stopflags=data.stopflags, offset=data.offset, spread=data.spread, balance=data.balance, uid=data.uid,
-            filled_qty=data.filled_qty, withdraw_time=data.withdraw_time, condition_price2=data.condition_price2,
-            active_from_time=data.active_from_time, active_to_time=data.active_to_time, sec_code=data.sec_code,
+            order_num=data.order_num, ordertime=StopOrder._convert_time(data.ordertime), flags=data.flags,
+            brokerref=data.brokerref, firmid=data.firmid, account=data.account, condition=data.condition,
+            condition_price=data.condition_price, price=data.price, qty=data.qty, linkedorder=data.linkedorder,
+            expiry=data.expiry, trans_id=data.trans_id, client_code=data.client_code, co_order_num=data.co_order_num,
+            co_order_price=data.co_order_price, stop_order_type=data.stop_order_type, orderdate=data.orderdate,
+            alltrade_num=data.alltrade_num, stopflags=data.stopflags, offset=data.offset, spread=data.spread,
+            balance=data.balance, uid=data.uid, filled_qty=data.filled_qty,
+            withdraw_time=StopOrder._convert_time(data.withdraw_time), condition_price2=data.condition_price2,
+            active_from_time=StopOrder._convert_time(data.active_from_time),
+            active_to_time=StopOrder._convert_time(data.active_to_time), sec_code=data.sec_code,
             class_code=data.class_code, condition_sec_code=data.condition_sec_code,
             condition_class_code=data.condition_class_code, canceled_uid=data.canceled_uid,
-            order_date_time=data.order_date_time, withdraw_datetime=data.withdraw_datetime,
+            order_date_time=StopOrder._convert_time(data.order_date_time),
+            withdraw_datetime=StopOrder._convert_time(data.withdraw_datetime),
         )
         return stop_order
 
