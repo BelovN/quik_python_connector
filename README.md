@@ -9,11 +9,11 @@
 ## connector
 Модуль для работы с асинхронной работы с библиотекой qlua напрямую. Для лучшего понимания читайте: [документация для qlua](https://gitlab.com/abrosimov.a.a/qlua/-/wikis/home)
 
-###connection.py
+### connection.py
 Управляет запросами и ответами в Quik, для пользователя в режиме REQ/REP. Запросы кодируются в Protocol Buffers и отправляются с помощью ZeroMQ 
 отправлять по url, указанному в настройках, а именно в `connector/settings.py`
 
-###events.py
+### events.py
 Подписывается на события Quik, для пользователя в режиме PUB/SUB. Все возможные события описаны в [API lua для Quik](http://luaq.ru/).
 Пример подписки на события:
 
@@ -26,10 +26,10 @@ def printer(response):
 Dispatcher().subscribe(EventTypes.ON_QUOTE, callback=printer)
 ```
 
-###managers.py
+### managers.py
 Модуль разбит на 4 основных класса по смыслу, все функции описаны в документации по [API lua для Quik](http://luaq.ru/)
 
-###settings.py
+### settings.py
 Файл для настроек соединения с quik-lua-rpc. Существует 2 типа соединения REQ и SUB. 
 Для каждого отдельно можно создать пользователя или не создавать, как в примере. 
 (Для удобства было принято решение сделать username и password такими же как и в Quik) 
